@@ -15,22 +15,38 @@
         android:background="@drawable/roundedcorner"
         android:orientation="vertical">
         <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+            android:id="@+id/etxtName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Name"/>
 
         <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+            android:id="@+id/etxtPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mobile Number"/>
 
 
         <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+            android:id="@+id/etxtLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Location"/>
 
 
+        <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+            android:id="@+id/btnJoin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circleborder"
+            android:text="Join"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="#FFF"
+            app:spinning_bar_padding="6dp"/>
+
     </LinearLayout>
+
 
 </LinearLayout>
