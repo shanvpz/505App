@@ -26,12 +26,26 @@
             android:layout_height="wrap_content"
             android:hint="Mobile Number"/>
 
+        <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+            android:id="@+id/etxtAltPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Alternate Number (optional)"/>
+
+        <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+            android:id="@+id/etxtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"/>
 
         <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
             android:id="@+id/etxtLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:editable="false"
             android:hint="Location"/>
+
+
 
 
         <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
