@@ -44,6 +44,7 @@ public class LocationHelper {
 
                         editor.putString("myLon",""+location.getLongitude());
                         editor.putString("myLat",""+location.getLatitude());
+                        editor.putString("myCoord",location.getLatitude()+","+location.getLongitude());
                         editor.putString("myCountry",result.getCountryName());
                         editor.putString("myDistrict",result.getSubAdminArea());
                         editor.putString("myState",result.getAdminArea());

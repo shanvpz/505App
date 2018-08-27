@@ -67,6 +67,7 @@ public class DBOps {
                 params.put("userstate",user.getUserstate());
                 params.put("usercountry",user.getUsercountry());
                 params.put("userpincode",user.getUserpincode());
+                params.put("usercoord",user.getUsercoord());
                 params.put("op","join");
 
                 return params;

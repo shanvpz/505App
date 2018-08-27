@@ -10,6 +10,17 @@ public class User {
     private String userstate;
     private String usercountry;
     private String userpincode;
+    private String usercoord;
+
+    public String getUsercoord() {
+        return usercoord;
+    }
+
+    public void setUsercoord(String usercoord) {
+        this.usercoord = usercoord;
+    }
+
+
     public User() {
 
     }

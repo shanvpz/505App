@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                                 user.setUserstate(sharedPreferences.getString("myState", ""));
                                 user.setUsercountry(sharedPreferences.getString("myCountry", ""));
                                 user.setUserpincode(sharedPreferences.getString("myPincode", ""));
+                                user.setUsercoord(sharedPreferences.getString("myCoord",""));
                                 new DBOps().UserRegistration(MainActivity.this,Globals.url,user);
                             }
                             else{
