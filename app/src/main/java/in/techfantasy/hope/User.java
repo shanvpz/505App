@@ -11,6 +11,15 @@ public class User {
     private String usercountry;
     private String userpincode;
     private String usercoord;
+    private String googleID;
+
+    public String getGoogleID() {
+        return googleID;
+    }
+
+    public void setGoogleID(String googleID) {
+        this.googleID = googleID;
+    }
 
     public String getUsercoord() {
         return usercoord;

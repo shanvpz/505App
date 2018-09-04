@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             public void onGranted() {
                 Toast.makeText(MainActivity.this, "Granted", Toast.LENGTH_SHORT).show();
                 permissionsGranted = true;
-
             }
 
             @Override
