@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ReqHelpFrag">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/roundedcorner"
+        android:orientation="vertical">
+    <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+        android:id="@+id/etxtName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"/>
+
+        <com.gcherubini.animatedexpandableedittext.AnimatedExpandableEditText
+            android:id="@+id/etxtHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Brief your requirements"/>
+
+
+
+        <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+            android:id="@+id/btnReqHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circleborder"
+            android:text="Request"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="#FFF"
+            app:spinning_bar_padding="6dp"/>
+    </LinearLayout>
+
+</FrameLayout>

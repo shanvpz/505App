@@ -191,6 +191,12 @@ public class JoinFrag extends Fragment {
                         Toast.makeText(getActivity(), "Connected", Toast.LENGTH_SHORT).show();
                         try{
                             if(formOK()) {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("myName",etxtName.getText().toString());
+                                editor.putString("myNumber",etxtPhone.getText().toString());
+                                editor.putString("firstTime","false");
+                                editor.commit();
+                                editor.apply();
                                 User user = new User();
                                 user.setUsername(etxtName.getText().toString());
                                 user.setUserphone(etxtPhone.getText().toString());

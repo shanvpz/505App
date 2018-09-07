@@ -35,6 +35,9 @@ import com.google.android.gms.common.api.Status;
 
 import java.io.InputStream;
 
+import libs.mjn.prettydialog.PrettyDialog;
+import libs.mjn.prettydialog.PrettyDialogCallback;
+
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -126,8 +129,8 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             //Similarly you can get the email and photourl using acct.getEmail() and  acct.getPhotoUrl()
             sharedPreferences=this.getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-
             editor.putString("googleID",""+acct.getId());
+            //editor.putString("loggedMode","");
             editor.commit();
             editor.apply();
 
@@ -317,8 +320,93 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
 
                 Bitmap resized = Bitmap.createScaledBitmap(result,200,200, true);
                 bmImage.setImageBitmap(ImageHelper.getRoundedCornerBitmap(getActivity(),resized,250,200,200, false, false, false, false));
-                loadFragment(new JoinFrag());
+                if(sharedPreferences.getString("firstTime","").equals("")){
+                    loadFragment(new JoinFrag());
+                }
+                else {
+                    if (sharedPreferences.getString("loggedMode", "").equals("")) {
+                        choodeMode();
+                    }
+                    else{
+                        String mode="";
+                        mode=sharedPreferences.getString("loggedMode","");
+                        if(mode.equals("")){
+                            choodeMode();
+                        }
+                        else if(mode.equals("Victim")){
+                            loadFragment(new ReqHelpFrag());
+                        }
+                    }
+                }
             }
+        }
+        private void choodeMode(){
+            final PrettyDialog pdialog = new PrettyDialog(getActivity());
+            pdialog.setTitle("Choose Mode")
+                    .setMessage("Please choose your mode!")
+                    .setIcon(
+                            R.drawable.pdlg_icon_info,     // icon resource
+                            R.color.pdlg_color_green,      // icon tint
+                            new PrettyDialogCallback() {   // icon OnClick listener
+                                @Override
+                                public void onClick() {
+                                    // Do what you gotta do
+                                }
+                            })
+                    .addButton(
+                            "Victim",     // button text
+                            R.color.pdlg_color_white,  // button text color
+                            R.color.pdlg_color_red,  // button background color
+                            new PrettyDialogCallback() {  // button OnClick listener
+                                @Override
+                                public void onClick() {
+                                    // Do what you gotta do
+                                    sharedPreferences=getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("loggedMode","Victim");
+                                    editor.commit();
+                                    editor.apply();
+                                    pdialog.dismiss();
+                                    loadFragment(new ReqHelpFrag());
+
+                                }
+                            }
+                    )
+                    .addButton(
+                            "Rescue",     // button text
+                            R.color.pdlg_color_white,  // button text color
+                            R.color.pdlg_color_green,  // button background color
+                            new PrettyDialogCallback() {  // button OnClick listener
+                                @Override
+                                public void onClick() {
+                                    // Do what you gotta do
+                                    sharedPreferences=getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("loggedMode","Rescue");
+                                    editor.commit();
+                                    editor.apply();
+                                    pdialog.dismiss();
+                                }
+                            }
+                    )
+                    .addButton(
+                            "Shelter",     // button text
+                            R.color.pdlg_color_white,  // button text color
+                            R.color.pdlg_color_gray,  // button background color
+                            new PrettyDialogCallback() {  // button OnClick listener
+                                @Override
+                                public void onClick() {
+                                    // Do what you gotta do
+                                    sharedPreferences=getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("loggedMode","Shelter");
+                                    editor.commit();
+                                    editor.apply();
+                                    pdialog.dismiss();
+                                }
+                            }
+                    )
+                    .show();
         }
     }
 }
