@@ -1,11 +1,13 @@
 package in.techfantasy.hope;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,9 +35,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.SmartLocation;
 import libs.mjn.prettydialog.PrettyDialog;
 import libs.mjn.prettydialog.PrettyDialogCallback;
 
@@ -66,6 +74,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
     private ProgressDialog mProgressDialog;
     private ImageView imgProfilePic;
     SharedPreferences sharedPreferences;
+    Boolean permissionsGranted = false;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -127,12 +136,17 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             GoogleSignInAccount acct = result.getSignInAccount();
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //Similarly you can get the email and photourl using acct.getEmail() and  acct.getPhotoUrl()
+            DBOps dbOps=new DBOps();
+            dbOps.getSingleUsergid(getActivity(),Globals.url,acct.getId());
+
+            //Toast.makeText(getActivity(),dbOps.u.getUsername(),Toast.LENGTH_LONG).show();
             sharedPreferences=this.getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("googleID",""+acct.getId());
             //editor.putString("loggedMode","");
             editor.commit();
             editor.apply();
+
 
             if(acct.getPhotoUrl() != null)
                 new LoadProfileImage(imgProfilePic).execute(acct.getPhotoUrl().toString());
@@ -202,9 +216,40 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             }
 
         });
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        String rationale = "Please grant the following permissions to continue";
+        Permissions.Options options = new Permissions.Options()
+                .setRationaleDialogTitle("Info")
+                .setSettingsDialogTitle("Warning");
+
+        Permissions.check(getActivity()/*context*/, permissions, rationale, options, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                Toast.makeText(getActivity(), "Granted", Toast.LENGTH_SHORT).show();
+                permissionsGranted = true;
+            }
+
+            @Override
+            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                Toast.makeText(getActivity(), "Sorry, You must grant permissions to use this app.", Toast.LENGTH_LONG).show();
+                getActivity().finish();
+                permissionsGranted = false;
+            }
+        });
+        SmartLocation.with(this.getActivity()).location().start(new OnLocationUpdatedListener() {
+            @Override
+            public void onLocationUpdated(Location location) {
+
+                new LocationHelper().decodeLocation(location,getActivity());
+                //etxtName.setText(sharedPreferences.getString("googleID",""));
+            }
+
+        });
 
         return v;
     }
+
+
 
     @Override
     public void onStart() {

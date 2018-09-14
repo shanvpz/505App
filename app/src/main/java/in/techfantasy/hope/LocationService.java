@@ -78,16 +78,17 @@ public class LocationService extends Service {
                     //Toast.makeText(getApplicationContext(), "Hello world", Toast.LENGTH_SHORT).show();
                     final ReqModel rm=new ReqModel();
                     rm.setGoogleID(sharedPreferences.getString("googleID",""));
-                    SmartLocation.with(getApplicationContext()).location().start(new OnLocationUpdatedListener() {
+                    SmartLocation.with(getApplicationContext()).location().oneFix().start(new OnLocationUpdatedListener() {
                         @Override
                         public void onLocationUpdated(Location location) {
                             new LocationHelper().decodeLocation(location,getApplicationContext());
-                            rm.setCoordinates(""+location.getLongitude()+","+location.getLatitude());
+                            rm.setCoordinates(""+location.getLatitude()+","+location.getLongitude());
                             new DBOps().UpdateLocation(getApplicationContext(),Globals.url,rm);
                             Toast.makeText(getApplicationContext(),"Location Updated",Toast.LENGTH_SHORT).show();
                         }
 
                     });
+
                 }
             });
         }
