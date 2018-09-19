@@ -9,6 +9,15 @@ public class ReqModel {
     private String reqID;
     private String remarks;
     private String googleID;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getGoogleID() {
         return googleID;

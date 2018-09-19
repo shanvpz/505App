@@ -236,15 +236,21 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
                 permissionsGranted = false;
             }
         });
-        SmartLocation.with(this.getActivity()).location().start(new OnLocationUpdatedListener() {
-            @Override
-            public void onLocationUpdated(Location location) {
+        try {
+            SmartLocation.with(this.getActivity()).location().start(new OnLocationUpdatedListener() {
+                @Override
+                public void onLocationUpdated(Location location) {
 
-                new LocationHelper().decodeLocation(location,getActivity());
-                //etxtName.setText(sharedPreferences.getString("googleID",""));
-            }
+                    new LocationHelper().decodeLocation(location,getActivity());
+                    //etxtName.setText(sharedPreferences.getString("googleID",""));
+                }
 
-        });
+            });
+        }
+        catch (Exception e){
+            Log.e("Issue with smartlocation",e.getMessage());
+        }
+
 
         return v;
     }
@@ -381,6 +387,9 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
                         else if(mode.equals("Victim")){
                             loadFragment(new ReqHelpFrag());
                         }
+                        else if(mode.equals("Rescue")){
+                            loadFragment(new MenuFrag());
+                        }
                     }
                 }
             }
@@ -431,6 +440,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
                                     editor.commit();
                                     editor.apply();
                                     pdialog.dismiss();
+                                    loadFragment(new MenuFrag());
                                 }
                             }
                     )

@@ -88,11 +88,20 @@ public class ReqHelpFrag extends Fragment {
             public void onClick(View view) {
                 if(btnReqHelp.getText().equals("Request")) {
                     btnReqHelp.setText("Cancel");
+                    ReqModel reqModel = new ReqModel();
+                    reqModel.setGoogleID(sharedPreferences.getString("googleID",""));
+                    reqModel.setMyHelp(etxtHelp.getText().toString());
+                    reqModel.setStatus("OPEN");
+
+                    new DBOps().PostRequest(getActivity(),Globals.url,reqModel);
                     Intent intentMyService = new Intent(getActivity(), LocationService.class);
                     getActivity().startService(intentMyService);
                 }
                 else {
                     btnReqHelp.setText("Request");
+                    ReqModel reqModel=new ReqModel();
+                    reqModel.setGoogleID(sharedPreferences.getString("googleID",""));
+                    new DBOps().CancelRequest(getActivity(),Globals.url,reqModel);
                     Intent intentMyService = new Intent(getActivity(), LocationService.class);
                     getActivity().stopService(intentMyService);
                 }
