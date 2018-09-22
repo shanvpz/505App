@@ -9,10 +9,15 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +42,7 @@ public class ReqListFrag extends Fragment {
     private String mParam2;
     RecyclerView recyclerView;
     List<cardRequestItem> cardRequestItems;
-
+    cardRequestAdapter cardRequestAdapter;
     private OnFragmentInteractionListener mListener;
 
     public ReqListFrag() {
@@ -63,6 +68,13 @@ public class ReqListFrag extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        loadData(getView());
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -77,21 +89,47 @@ public class ReqListFrag extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_req_list, container, false);
         recyclerView = v.findViewById(R.id.recyclerViewReq);
-
-        cardRequestItems = new ArrayList<cardRequestItem>();
-        cardRequestItems.add(new cardRequestItem("test1","test2","tws3"));
-        cardRequestItems.add(new cardRequestItem("rrrr","tttt","yyyy"));
-        cardRequestAdapter cardRequestAdapter = new cardRequestAdapter(getActivity(),cardRequestItems);
-
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(1, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(cardRequestAdapter);
+        //loadData(v);
+
 
         return v;
     }
 
+    private void loadData(View v){
+
+    try {
+        cardRequestItems = new ArrayList<cardRequestItem>();
+        //cardRequestItems.add(new cardRequestItem("test","test2","test3"));
+        DBOps dbOps = new DBOps(new VolleyResponseFetcher() {
+            @Override
+            public void onVolleyResponse(String response) {
+                try {
+                    JSONArray jsonArray = new JSONArray(response);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        cardRequestItems.add(new cardRequestItem(jsonObject.getString("username"), jsonObject.getString("userphone"), jsonObject.getString("usercoord")));
+                    }
+
+                    cardRequestAdapter cardRequestAdapter = new cardRequestAdapter(getActivity(), cardRequestItems);
+
+                    recyclerView.setAdapter(cardRequestAdapter);
+                    cardRequestAdapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        dbOps.getAllRequests(getActivity(), Globals.url);
+    }
+    catch (Exception ex){
+        Log.e("From loadData",ex.getMessage());
+    }
+    }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 

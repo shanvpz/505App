@@ -13,6 +13,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +27,14 @@ public class DBOps {
     ProgressDialog progressDialog;
     User u;
     SharedPreferences sharedPreferences;
+    VolleyResponseFetcher volleyResponseFetcher;
+
+    public  DBOps(){
+
+    }
+    public DBOps(VolleyResponseFetcher vrf){
+        this.volleyResponseFetcher = vrf;
+    }
 
     public void UserRegistration(final Context ctx, String HttpUrl, final User user){
         try {
@@ -49,7 +58,8 @@ public class DBOps {
                             Toast.makeText(ctx, ServerResponse, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(ServerResponse);
-                                if(jsonObject.getString("code").equals("1")){
+                                JSONArray jsonArray=jsonObject.getJSONArray("response");
+                                if(jsonArray.getJSONObject(0).getString("code").equals("1")){
                                     ctx.startActivity(new Intent(ctx,MainContainer.class));
                                 }
                             } catch (JSONException e) {
@@ -95,7 +105,7 @@ public class DBOps {
 
             };
             // Creating RequestQueue.
-            RequestQueue requestQueue = Volley.newRequestQueue(ctx);
+            requestQueue = Volley.newRequestQueue(ctx);
 
             // Adding the StringRequest object into requestQueue.
             requestQueue.add(stringRequest);
@@ -129,7 +139,8 @@ public class DBOps {
                             Toast.makeText(ctx, ServerResponse, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(ServerResponse);
-                                if(jsonObject.getString("code").equals("1")){
+                                JSONArray jsonArray=jsonObject.getJSONArray("response");
+                                if(jsonArray.getJSONObject(0).getString("code").equals("1")){
                                     // ctx.startActivity(new Intent(ctx,));
                                 }
                             } catch (JSONException e) {
@@ -166,7 +177,7 @@ public class DBOps {
 
             };
             // Creating RequestQueue.
-            RequestQueue requestQueue = Volley.newRequestQueue(ctx);
+            requestQueue = Volley.newRequestQueue(ctx);
 
             // Adding the StringRequest object into requestQueue.
             requestQueue.add(stringRequest);
@@ -201,15 +212,31 @@ public class DBOps {
                             //Toast.makeText(ctx, ServerResponse, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(ServerResponse);
-                                if(jsonObject.getString("code").equals("1")){
+                                JSONArray jsonArray=jsonObject.getJSONArray("response");
+                                if(jsonArray.getJSONObject(0).getString("code").equals("1")){
+                                    JSONArray data=jsonObject.getJSONArray("datas");
+                                    jsonObject = data.getJSONObject(0);
                                     //ctx.startActivity(new Intent(ctx,MainContainer.class));
                                     sharedPreferences=ctx.getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putString("myName",jsonObject.getString("username"));
-                                    editor.putString("myPhone",jsonObject.getString("userphone"));
-                                    editor.putString("myAltPhone",jsonObject.getString("useraltphone"));
-                                    editor.putString("myEmail",jsonObject.getString("useremail"));
-                                    editor.putString("firstTime","false");
+                                    if(jsonObject.has("username")){
+                                        editor.putString("myName",jsonObject.getString("username"));
+                                    }
+                                    if(jsonObject.has("userphone")){
+                                        editor.putString("myPhone",jsonObject.getString("userphone"));
+                                    }
+                                    if(jsonObject.has("useraltphone")){
+                                        editor.putString("myAltPhone",jsonObject.getString("useraltphone"));
+                                    }
+                                    if(jsonObject.has("useremail")){
+                                        editor.putString("myEmail",jsonObject.getString("useremail"));
+                                    }
+                                    if (jsonObject.has("googleID")){
+                                        editor.putString("firstTime","false");
+                                    }else {
+                                        editor.putString("firstTime","true");
+                                    }
+
                                     //editor.putString("loggedMode","");
                                     editor.commit();
                                     editor.apply();
@@ -248,7 +275,7 @@ public class DBOps {
 
             };
             // Creating RequestQueue.
-            RequestQueue requestQueue = Volley.newRequestQueue(ctx);
+            requestQueue = Volley.newRequestQueue(ctx);
 
             // Adding the StringRequest object into requestQueue.
             requestQueue.add(stringRequest);
@@ -321,7 +348,7 @@ public class DBOps {
 
             };
             // Creating RequestQueue.
-            RequestQueue requestQueue = Volley.newRequestQueue(ctx);
+            requestQueue = Volley.newRequestQueue(ctx);
 
             // Adding the StringRequest object into requestQueue.
             requestQueue.add(stringRequest);
@@ -396,7 +423,7 @@ public class DBOps {
 
             };
             // Creating RequestQueue.
-            RequestQueue requestQueue = Volley.newRequestQueue(ctx);
+            requestQueue = Volley.newRequestQueue(ctx);
 
             // Adding the StringRequest object into requestQueue.
             requestQueue.add(stringRequest);
@@ -470,13 +497,90 @@ public class DBOps {
 
             };
             // Creating RequestQueue.
-            RequestQueue requestQueue = Volley.newRequestQueue(ctx);
+            requestQueue = Volley.newRequestQueue(ctx);
 
             // Adding the StringRequest object into requestQueue.
             requestQueue.add(stringRequest);
         }
         catch (Exception ex){
             Toast.makeText(ctx,"From Request cancelling:"+ex.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+    public void getAllRequests(final Context ctx, String HttpUrl){
+        try {
+            u=new User();
+            requestQueue = Volley.newRequestQueue(ctx);
+
+            progressDialog = new ProgressDialog(ctx);
+            // Showing progress dialog at user registration time.
+            progressDialog.setMessage("Please Wait, Connecting to server!");
+            progressDialog.show();
+
+            // Creating string request with post method.
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, HttpUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String ServerResponse) {
+
+                            // Hiding the progress dialog after all task complete.
+                            progressDialog.dismiss();
+                            // Showing Echo Response Message Coming From Server.
+                            //Toast.makeText(ctx, ServerResponse, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jobj = new JSONObject(ServerResponse);
+                                JSONArray jsonArrayData = jobj.getJSONArray("datas");
+                                JSONArray jsonArrayRes = jobj.getJSONArray("response");
+                                if(jsonArrayRes.getJSONObject(0).getString("code").equals("1")){
+                                    volleyResponseFetcher.onVolleyResponse(jsonArrayData.toString());
+                                }else {
+                                    Toast.makeText(ctx, jobj.getString("msg"), Toast.LENGTH_LONG).show();
+                                }
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Toast.makeText(ctx,"From getAllrequests:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+
+                            // Hiding the progress dialog after all task complete.
+                            progressDialog.dismiss();
+
+                            // Showing error message if something goes wrong.
+                            Toast.makeText(ctx, volleyError.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+
+                    // Creating Map String Params.
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    // Adding All values to Params.
+                    // The firs argument should be same sa your MySQL database table columns.
+
+                    params.put("op", "getallrequests");
+
+                    return params;
+                }
+
+            };
+            // Creating RequestQueue.
+            requestQueue = Volley.newRequestQueue(ctx);
+
+            // Adding the StringRequest object into requestQueue.
+            requestQueue.add(stringRequest);
+        }
+        catch (Exception ex){
+            Toast.makeText(ctx,"From getAllrequests:"+ex.getMessage(),Toast.LENGTH_SHORT).show();
         }
 
     }

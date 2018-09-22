@@ -19,6 +19,7 @@ public class MainContainer extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.mainLayout, fragment);
+       // fragmentTransaction.addToBackStack(fragment.getTag());
         fragmentTransaction.commit();
     }
 }

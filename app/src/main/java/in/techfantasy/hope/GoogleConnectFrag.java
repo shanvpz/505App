@@ -1,6 +1,7 @@
 package in.techfantasy.hope;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -120,6 +121,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
                 .build();
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -140,7 +142,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             dbOps.getSingleUsergid(getActivity(),Globals.url,acct.getId());
 
             //Toast.makeText(getActivity(),dbOps.u.getUsername(),Toast.LENGTH_LONG).show();
-            sharedPreferences=this.getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("googleID",""+acct.getId());
             //editor.putString("loggedMode","");
@@ -150,6 +152,8 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
 
             if(acct.getPhotoUrl() != null)
                 new LoadProfileImage(imgProfilePic).execute(acct.getPhotoUrl().toString());
+            else
+                new LoadProfileImage(imgProfilePic).execute("http://techfantasy.in/img/small-logotf.png");
 
             updateUI(true);
         } else {
@@ -163,6 +167,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
         FragmentManager fm = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.mainLayout, fragment);
+        //fragmentTransaction.addToBackStack(getActivity().);
         fragmentTransaction.commit();
     }
     private void updateUI(boolean signedIn) {
@@ -181,11 +186,13 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
 
 
 
+    @SuppressLint("LongLogTag")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_google_connect, container, false);
+        sharedPreferences=this.getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
          signInButton = (SignInButton) v.findViewById(R.id.btnGoogle);
         signOutButton = (Button) v.findViewById(R.id.btnDeGoogle);
         imgProfilePic = (ImageView) v.findViewById(R.id.img_profile_pic);
@@ -251,7 +258,11 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             Log.e("Issue with smartlocation",e.getMessage());
         }
 
-
+        if (sharedPreferences.contains("firstTime")){
+            if(sharedPreferences.getString("firstTime","").equals("true")) {
+                loadFragment(new JoinFrag());
+            }
+        }
         return v;
     }
 
@@ -365,34 +376,34 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
         }
 
         protected void onPostExecute(Bitmap result) {
+try {
+    if (result != null) {
 
-            if (result != null) {
 
-
-                Bitmap resized = Bitmap.createScaledBitmap(result,200,200, true);
-                bmImage.setImageBitmap(ImageHelper.getRoundedCornerBitmap(getActivity(),resized,250,200,200, false, false, false, false));
-                if(sharedPreferences.getString("firstTime","").equals("")){
-                    loadFragment(new JoinFrag());
-                }
-                else {
-                    if (sharedPreferences.getString("loggedMode", "").equals("")) {
-                        choodeMode();
-                    }
-                    else{
-                        String mode="";
-                        mode=sharedPreferences.getString("loggedMode","");
-                        if(mode.equals("")){
-                            choodeMode();
-                        }
-                        else if(mode.equals("Victim")){
-                            loadFragment(new ReqHelpFrag());
-                        }
-                        else if(mode.equals("Rescue")){
-                            loadFragment(new MenuFrag());
-                        }
-                    }
-                }
+        Bitmap resized = Bitmap.createScaledBitmap(result, 200, 200, true);
+        bmImage.setImageBitmap(ImageHelper.getRoundedCornerBitmap(getActivity(), resized, 250, 200, 200, false, false, false, false));
+    }
+    if (sharedPreferences.getString("firstTime", "").equals("true")) {
+        loadFragment(new JoinFrag());
+    } else {
+        if (sharedPreferences.getString("loggedMode", "").equals("")) {
+            choodeMode();
+        } else {
+            String mode = "";
+            mode = sharedPreferences.getString("loggedMode", "");
+            if (mode.equals("")) {
+                choodeMode();
+            } else if (mode.equals("Victim")) {
+                loadFragment(new ReqHelpFrag());
+            } else if (mode.equals("Rescue")) {
+                loadFragment(new MenuFrag());
             }
+        }
+    }
+}
+catch (Exception e){
+    Log.e("from g connect",e.getMessage());
+}
         }
         private void choodeMode(){
             final PrettyDialog pdialog = new PrettyDialog(getActivity());
