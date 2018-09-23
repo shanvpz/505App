@@ -3,21 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:layout_margin="3dp"
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         app:cardCornerRadius="10dp"
         app:cardElevation="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:weightSum="2">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
             <TextView
                 android:id="@+id/txtRequstee"
+                android:paddingTop="5dp"
+                android:textAllCaps="true"
+                android:textStyle="bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView" />
@@ -25,20 +36,74 @@
             <TextView
                 android:id="@+id/txtRequest"
                 android:layout_width="match_parent"
+                android:textStyle="italic"
                 android:layout_height="wrap_content"
                 android:text="TextView" />
 
-            <TextView
-                android:id="@+id/txtRequesteeContact"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
 
-            <TextView
-                android:id="@+id/txtDistance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:weightSum="2"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:weightSum="1"
+                    android:layout_weight="1">
+                <ImageButton
+                    android:id="@+id/btnCall"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:scaleType="fitCenter"
+                    android:padding="5dp"
+                    android:layout_weight=".7"
+                    android:background="@null"
+                    android:src="@drawable/callbutton"/>
+                    <TextView
+                        android:id="@+id/txtRequesteeContact"
+                        android:layout_width="match_parent"
+                        android:layout_weight=".3"
+                        android:layout_height="0dp"
+                        android:text="TextView" />
+            </LinearLayout>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#11960a"/>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:weightSum="1"
+                    android:paddingLeft="5dp"
+                    android:layout_weight="1">
+                <ImageButton
+                    android:id="@+id/btnLocate"
+                    android:layout_width="match_parent"
+                    android:layout_weight=".7"
+                    android:layout_height="0dp"
+                    android:scaleType="fitCenter"
+                    android:padding="5dp"
+                    android:background="@null"
+                    android:src="@drawable/location"/>
+
+
+
+                    <TextView
+                        android:id="@+id/txtDistance"
+                        android:layout_width="match_parent"
+                        android:layout_weight=".3"
+                        android:layout_height="0dp"
+                        android:text="TextView" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

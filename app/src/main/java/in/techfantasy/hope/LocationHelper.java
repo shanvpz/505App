@@ -61,6 +61,7 @@ try {
             }
 
         });
+        SmartLocation.with(ctx).location().stop(); //to be checked
     } else {
 
     }

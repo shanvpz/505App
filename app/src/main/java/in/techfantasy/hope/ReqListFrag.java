@@ -111,7 +111,7 @@ public class ReqListFrag extends Fragment {
                     JSONArray jsonArray = new JSONArray(response);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        cardRequestItems.add(new cardRequestItem(jsonObject.getString("username"), jsonObject.getString("userphone"), jsonObject.getString("usercoord")));
+                        cardRequestItems.add(new cardRequestItem(jsonObject.getString("username"), jsonObject.getString("userphone"), jsonObject.getString("usercoord"),jsonObject.getString("description"),jsonObject.getString("requestID")));
                     }
 
                     cardRequestAdapter cardRequestAdapter = new cardRequestAdapter(getActivity(), cardRequestItems);
@@ -130,6 +130,7 @@ public class ReqListFrag extends Fragment {
         Log.e("From loadData",ex.getMessage());
     }
     }
+
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 

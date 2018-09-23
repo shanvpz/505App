@@ -39,16 +39,19 @@ public class cardMenuAdapter extends RecyclerView.Adapter<cardMenuAdapter.myMenu
             public void onClick(View view) {
                 Toast.makeText(ctx,position+"",Toast.LENGTH_SHORT).show();
                 if (position==0){
-                    loadFragment(new ReqListFrag());
+                    loadFragment(new ReqListFrag(),true);
                 }
             }
         });
     }
 
-    private void loadFragment(Fragment fragment) {
+    private void loadFragment(Fragment fragment,boolean addToBackstack) {
         FragmentManager fm = ((FragmentActivity) ctx).getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.mainLayout, fragment);
+        if (addToBackstack){
+            fragmentTransaction.addToBackStack(fragment.getTag());
+        }
         fragmentTransaction.commit();
     }
 

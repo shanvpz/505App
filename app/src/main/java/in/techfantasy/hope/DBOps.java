@@ -585,4 +585,85 @@ public class DBOps {
 
     }
 
+
+    public void modifyRequest(final Context ctx, String HttpUrl, final String status, final String googleID, final String remarks, final String reqID){
+        try {
+            u=new User();
+            requestQueue = Volley.newRequestQueue(ctx);
+
+            progressDialog = new ProgressDialog(ctx);
+            // Showing progress dialog at user registration time.
+            progressDialog.setMessage("Please Wait, Connecting to server!");
+            progressDialog.show();
+
+            // Creating string request with post method.
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, HttpUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String ServerResponse) {
+
+                            // Hiding the progress dialog after all task complete.
+                            progressDialog.dismiss();
+                            // Showing Echo Response Message Coming From Server.
+                            //Toast.makeText(ctx, ServerResponse, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jsonobj = new JSONObject(ServerResponse);
+                                //JSONArray jsonArrayData = jobj.getJSONArray("datas");
+                                JSONObject jobj = jsonobj.getJSONArray("response").getJSONObject(0);
+                                if(jobj.getString("code").equals("1")){
+                                    //volleyResponseFetcher.onVolleyResponse(jsonArrayData.toString());
+                                    Toast.makeText(ctx, jobj.getString("msg"), Toast.LENGTH_LONG).show();
+                                }else {
+                                    Toast.makeText(ctx, jobj.getString("msg"), Toast.LENGTH_LONG).show();
+                                }
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Toast.makeText(ctx,"From modifyRequest:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+
+                            // Hiding the progress dialog after all task complete.
+                            progressDialog.dismiss();
+
+                            // Showing error message if something goes wrong.
+                            Toast.makeText(ctx, volleyError.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+
+                    // Creating Map String Params.
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    // Adding All values to Params.
+                    // The firs argument should be same sa your MySQL database table columns.
+                    params.put("requestID",reqID);
+                    params.put("googleID",googleID);
+                    params.put("remark",remarks);
+                    params.put("status",status);
+                    params.put("op", "modifyRequest");
+
+                    return params;
+                }
+
+            };
+            // Creating RequestQueue.
+            requestQueue = Volley.newRequestQueue(ctx);
+
+            // Adding the StringRequest object into requestQueue.
+            requestQueue.add(stringRequest);
+        }
+        catch (Exception ex){
+            Toast.makeText(ctx,"From modifyRequest:"+ex.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 }

@@ -2,6 +2,7 @@ package in.techfantasy.hope;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -76,6 +77,8 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
     private ImageView imgProfilePic;
     SharedPreferences sharedPreferences;
     Boolean permissionsGranted = false;
+    Activity a;
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -139,7 +142,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //Similarly you can get the email and photourl using acct.getEmail() and  acct.getPhotoUrl()
             DBOps dbOps=new DBOps();
-            dbOps.getSingleUsergid(getActivity(),Globals.url,acct.getId());
+            dbOps.getSingleUsergid(a,Globals.url,acct.getId());
 
             //Toast.makeText(getActivity(),dbOps.u.getUsername(),Toast.LENGTH_LONG).show();
 
@@ -163,11 +166,13 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
     }
 
 
-    private void loadFragment(Fragment fragment) {
+    private void loadFragment(Fragment fragment,boolean addToBackstack) {
         FragmentManager fm = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.mainLayout, fragment);
-        //fragmentTransaction.addToBackStack(getActivity().);
+        if(addToBackstack) {
+            fragmentTransaction.addToBackStack(fragment.getTag());
+        }
         fragmentTransaction.commit();
     }
     private void updateUI(boolean signedIn) {
@@ -192,7 +197,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_google_connect, container, false);
-        sharedPreferences=this.getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+        sharedPreferences=a.getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
          signInButton = (SignInButton) v.findViewById(R.id.btnGoogle);
         signOutButton = (Button) v.findViewById(R.id.btnDeGoogle);
         imgProfilePic = (ImageView) v.findViewById(R.id.img_profile_pic);
@@ -223,32 +228,45 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             }
 
         });
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.CALL_PHONE};
         String rationale = "Please grant the following permissions to continue";
         Permissions.Options options = new Permissions.Options()
                 .setRationaleDialogTitle("Info")
                 .setSettingsDialogTitle("Warning");
 
-        Permissions.check(getActivity()/*context*/, permissions, rationale, options, new PermissionHandler() {
+        Permissions.check(a/*context*/, permissions, rationale, options, new PermissionHandler() {
             @Override
             public void onGranted() {
-                Toast.makeText(getActivity(), "Granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(a, "Granted", Toast.LENGTH_SHORT).show();
                 permissionsGranted = true;
             }
 
             @Override
             public void onDenied(Context context, ArrayList<String> deniedPermissions) {
-                Toast.makeText(getActivity(), "Sorry, You must grant permissions to use this app.", Toast.LENGTH_LONG).show();
-                getActivity().finish();
-                permissionsGranted = false;
+                try {
+
+                    Toast.makeText(a, "Sorry, You must grant permissions to use this app.", Toast.LENGTH_LONG).show();
+                    a.finish();
+                    //Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                    //startActivity(i);
+                    permissionsGranted = false;
+                    //System.exit(0);
+
+
+                }
+                catch (Exception ex){
+                    Log.e("From Permission Denied:",ex.getMessage());
+                    //System.exit(0);
+                }
+
             }
         });
         try {
-            SmartLocation.with(this.getActivity()).location().start(new OnLocationUpdatedListener() {
+            SmartLocation.with(a).location().start(new OnLocationUpdatedListener() {
                 @Override
                 public void onLocationUpdated(Location location) {
 
-                    new LocationHelper().decodeLocation(location,getActivity());
+                    new LocationHelper().decodeLocation(location,a);
                     //etxtName.setText(sharedPreferences.getString("googleID",""));
                 }
 
@@ -260,7 +278,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
 
         if (sharedPreferences.contains("firstTime")){
             if(sharedPreferences.getString("firstTime","").equals("true")) {
-                loadFragment(new JoinFrag());
+                loadFragment(new JoinFrag(),false);
             }
         }
         return v;
@@ -282,7 +300,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
             // If the user has not previously signed in on this device or the sign-in has expired,
             // this asynchronous branch will attempt to sign in the user silently.  Cross-device
             // single sign-on will occur in this branch.
-            showProgressDialog();
+            //showProgressDialog();
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult googleSignInResult) {
@@ -303,6 +321,10 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
     @Override
     public void onAttach(Context context) {
           super.onAttach(context);
+
+        if (context instanceof Activity){
+            a=(Activity) context;
+        }
 //        if (context instanceof OnFragmentInteractionListener) {
 //            mListener = (OnFragmentInteractionListener) context;
 //        } else {
@@ -325,7 +347,7 @@ public class GoogleConnectFrag extends Fragment implements GoogleApiClient.OnCon
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog = new ProgressDialog(a);
             mProgressDialog.setMessage("Loading....");
             mProgressDialog.setIndeterminate(true);
         }
@@ -381,10 +403,10 @@ try {
 
 
         Bitmap resized = Bitmap.createScaledBitmap(result, 200, 200, true);
-        bmImage.setImageBitmap(ImageHelper.getRoundedCornerBitmap(getActivity(), resized, 250, 200, 200, false, false, false, false));
+        bmImage.setImageBitmap(ImageHelper.getRoundedCornerBitmap(a, resized, 250, 200, 200, false, false, false, false));
     }
     if (sharedPreferences.getString("firstTime", "").equals("true")) {
-        loadFragment(new JoinFrag());
+        loadFragment(new JoinFrag(),false);
     } else {
         if (sharedPreferences.getString("loggedMode", "").equals("")) {
             choodeMode();
@@ -394,9 +416,9 @@ try {
             if (mode.equals("")) {
                 choodeMode();
             } else if (mode.equals("Victim")) {
-                loadFragment(new ReqHelpFrag());
+                loadFragment(new ReqHelpFrag(),false);
             } else if (mode.equals("Rescue")) {
-                loadFragment(new MenuFrag());
+                loadFragment(new MenuFrag(),false);
             }
         }
     }
@@ -406,7 +428,7 @@ catch (Exception e){
 }
         }
         private void choodeMode(){
-            final PrettyDialog pdialog = new PrettyDialog(getActivity());
+            final PrettyDialog pdialog = new PrettyDialog(a);
             pdialog.setTitle("Choose Mode")
                     .setMessage("Please choose your mode!")
                     .setIcon(
@@ -426,13 +448,13 @@ catch (Exception e){
                                 @Override
                                 public void onClick() {
                                     // Do what you gotta do
-                                    sharedPreferences=getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+                                    sharedPreferences=a.getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("loggedMode","Victim");
                                     editor.commit();
                                     editor.apply();
                                     pdialog.dismiss();
-                                    loadFragment(new ReqHelpFrag());
+                                    loadFragment(new ReqHelpFrag(),false);
 
                                 }
                             }
@@ -445,13 +467,13 @@ catch (Exception e){
                                 @Override
                                 public void onClick() {
                                     // Do what you gotta do
-                                    sharedPreferences=getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+                                    sharedPreferences=a.getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("loggedMode","Rescue");
                                     editor.commit();
                                     editor.apply();
                                     pdialog.dismiss();
-                                    loadFragment(new MenuFrag());
+                                    loadFragment(new MenuFrag(),false);
                                 }
                             }
                     )
@@ -463,7 +485,7 @@ catch (Exception e){
                                 @Override
                                 public void onClick() {
                                     // Do what you gotta do
-                                    sharedPreferences=getActivity().getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
+                                    sharedPreferences=a.getSharedPreferences(Globals.sharedPrefName,MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("loggedMode","Shelter");
                                     editor.commit();
